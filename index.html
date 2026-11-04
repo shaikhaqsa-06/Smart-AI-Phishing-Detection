@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Smart AI Phishing URL Blocker</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
+    <header class="header">
+
+        <div class="container">
+
+            <div class="header-inner">
+
+                <div class="brand">
+
+                    <div class="logo">
+                        AI
+                    </div>
+
+                    <div class="brand-text">
+
+                        <h1>
+                            Smart AI Phishing URL Blocker
+                        </h1>
+
+                        <p>
+                            Machine Learning Based URL Detection System
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="status-badge">
+
+                    <span class="status-dot"></span>
+
+                    AI Scanner Online
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
+
+    <main>
+
+        <div class="container">
+
+
+            <!-- =================================================
+                 HERO
+                 ================================================= -->
+
+            <section class="hero">
+
+                <h2>
+
+                    Detect
+                    <span>Phishing URLs</span>
+                    with AI
+
+                </h2>
+
+                <p>
+
+                    Analyze a website URL using machine learning
+                    and identify potential phishing threats.
+
+                </p>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 SCANNER
+                 ================================================= -->
+
+            <section class="card scanner-card">
+
+                <div class="scanner-heading">
+
+                    <div>
+
+                        <h3 class="section-title">
+                            Scan a Website URL
+                        </h3>
+
+                        <p class="section-subtitle">
+                            Enter the complete URL including
+                            http:// or https://
+                        </p>
+
+                    </div>
+
+                    <div class="scanner-icon">
+                        🔍
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="/"
+                    id="scanForm"
+                >
+
+                    <div class="form-group">
+
+                        <input
+                            type="text"
+                            name="url"
+                            id="urlInput"
+                            class="url-input"
+                            placeholder="https://example.com"
+                            value="{{ scanned_url or '' }}"
+                            autocomplete="off"
+                            required
+                        >
+
+
+                        <button
+                            type="submit"
+                            class="scan-button"
+                            id="scanButton"
+                        >
+                            Scan URL
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <p class="form-hint">
+
+                    🔒 Private and local network addresses are
+                    blocked for security.
+
+                </p>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ERROR
+                 ================================================= -->
+
+            {% if error_message %}
+
+            <section class="error-card">
+
+                <div class="error-title">
+                    ⚠ Scan Error
+                </div>
+
+                <div class="error-message">
+                    {{ error_message }}
+                </div>
+
+            </section>
+
+            {% endif %}
+
+
+
+            <!-- =================================================
+                 RESULT
+                 ================================================= -->
+
+            {% if result %}
+
+            <section class="card result-card">
+
+
+                <!-- RESULT TOP -->
+
+                <div class="result-header">
+
+
+                    <div class="result-main">
+
+                        <div class="result-title">
+                            Detection Result
+                        </div>
+
+
+                        {% if result == "LEGITIMATE" %}
+
+                        <div class="result-value safe">
+                            ✓ LEGITIMATE
+                        </div>
+
+                        <div class="result-line safe-line"></div>
+
+                        {% else %}
+
+                        <div class="result-value danger">
+                            ⚠ PHISHING
+                        </div>
+
+                        <div class="result-line danger-line"></div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if result == "LEGITIMATE" %}
+
+                    <div class="result-badge safe">
+                        ✓ Low Risk
+                    </div>
+
+                    {% else %}
+
+                    <div class="result-badge danger">
+                        ⚠ High Risk
+                    </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     CONFIDENCE
+                     ================================================= -->
+
+                <div class="confidence-section">
+
+                    <div class="confidence-header">
+
+                        <span class="confidence-label">
+                            Model Confidence
+                        </span>
+
+                        <span class="confidence-value">
+                            {{ "%.2f"|format(confidence|float) }}%
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            data-confidence="{{ confidence|float }}"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     URL INFORMATION
+                     ================================================= -->
+
+                <div class="url-box">
+
+                    <div class="url-label">
+                        Scanned URL
+                    </div>
+
+                    <div class="url-value">
+                        {{ scanned_url }}
+                    </div>
+
+                </div>
+
+
+                {% if final_url %}
+
+                <div class="url-box">
+
+                    <div class="url-label">
+                        Final URL
+                    </div>
+
+                    <div class="url-value">
+                        {{ final_url }}
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+
+                <!-- =================================================
+                     QUICK INFORMATION
+                     ================================================= -->
+
+                <div class="info-grid">
+
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            🛡
+                        </div>
+
+                        <div>
+
+                            <div class="info-label">
+                                Detection
+                            </div>
+
+                            <div class="info-value">
+
+                                {% if result == "LEGITIMATE" %}
+
+                                Website appears legitimate.
+
+                                {% else %}
+
+                                Website shows phishing characteristics.
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            🤖
+                        </div>
+
+                        <div>
+
+                            <div class="info-label">
+                                Model
+                            </div>
+
+                            <div class="info-value">
+                                Tuned Random Forest
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     RISK INDICATORS
+                     ================================================= -->
+
+                {% if risk_indicators %}
+
+                <div class="risk-section">
+
+                    <div class="section-heading-row">
+
+                        <div>
+
+                            <h3 class="section-title">
+                                Risk Indicators
+                            </h3>
+
+                            <p class="section-subtitle">
+                                Suspicious characteristics found during analysis.
+                            </p>
+
+                        </div>
+
+                        <span class="section-count">
+                            {{ risk_indicators|length }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="risk-list">
+
+                        {% for risk in risk_indicators %}
+
+                        <div class="risk-item">
+
+                            <div class="risk-icon">
+                                !
+                            </div>
+
+                            <div class="risk-text">
+                                {{ risk }}
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+
+                <!-- =================================================
+                     FEATURE ANALYSIS
+                     ================================================= -->
+
+                {% if feature_check %}
+
+                <div class="feature-section">
+
+                    <div class="section-heading-row">
+
+                        <div>
+
+                            <h3 class="section-title">
+                                Feature Analysis
+                            </h3>
+
+                            <p class="section-subtitle">
+                                URL and webpage characteristics analyzed by the model.
+                            </p>
+
+                        </div>
+
+                        <span class="feature-total">
+                            30 Features
+                        </span>
+
+                    </div>
+
+
+                    <div class="table-wrapper">
+
+                        <table class="feature-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Feature
+                                    </th>
+
+                                    <th>
+                                        Value
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for item in feature_check %}
+
+                                <tr>
+
+                                    <td class="feature-name">
+                                        {{ item.name }}
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if item.value == -1 %}
+
+                                        <span class="feature-negative">
+                                            -1
+                                        </span>
+
+                                        {% elif item.value == 1 %}
+
+                                        <span class="feature-positive">
+                                            1
+                                        </span>
+
+                                        {% else %}
+
+                                        <span class="feature-neutral">
+                                            {{ item.value }}
+                                        </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if item.status == "Suspicious" %}
+
+                                        <span class="status-pill suspicious">
+                                            Suspicious
+                                        </span>
+
+                                        {% elif item.status == "Normal" %}
+
+                                        <span class="status-pill normal">
+                                            Normal
+                                        </span>
+
+                                        {% else %}
+
+                                        <span class="status-pill neutral">
+                                            Neutral
+                                        </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+
+                <!-- =================================================
+                     MODEL INFORMATION
+                     ================================================= -->
+
+                <div class="model-section">
+
+                    <div class="model-box">
+
+                        <div class="model-label">
+                            Algorithm
+                        </div>
+
+                        <div class="model-value">
+                            Random Forest
+                        </div>
+
+                    </div>
+
+
+                    <div class="model-box">
+
+                        <div class="model-label">
+                            Model Type
+                        </div>
+
+                        <div class="model-value">
+                            Supervised ML
+                        </div>
+
+                    </div>
+
+
+                    <div class="model-box">
+
+                        <div class="model-label">
+                            Features
+                        </div>
+
+                        <div class="model-value">
+                            30 URL Features
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+            {% endif %}
+
+
+        </div>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
+
+    <footer class="footer">
+
+        <div class="container">
+
+            <p>
+
+                <strong>
+                    Smart AI Phishing URL Blocker
+                </strong>
+
+                &nbsp; | &nbsp;
+
+                Machine Learning Based Phishing Detection
+
+            </p>
+
+            <p>
+                Major Project — Bachelor of Computer Applications
+            </p>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+
+                /* ---------------------------------------------
+                   CONFIDENCE BAR
+                   --------------------------------------------- */
+
+                const progressBar =
+                    document.querySelector(
+                        ".progress-bar"
+                    );
+
+
+                if (progressBar) {
+
+                    let confidence =
+                        parseFloat(
+                            progressBar.dataset.confidence
+                        );
+
+
+                    if (Number.isNaN(confidence)) {
+                        confidence = 0;
+                    }
+
+
+                    confidence =
+                        Math.max(
+                            0,
+                            Math.min(
+                                100,
+                                confidence
+                            )
+                        );
+
+
+                    progressBar.style.setProperty(
+                        "--confidence-width",
+                        confidence + "%"
+                    );
+
+                }
+
+
+
+                /* ---------------------------------------------
+                   SCAN BUTTON
+                   --------------------------------------------- */
+
+                const scanForm =
+                    document.getElementById(
+                        "scanForm"
+                    );
+
+
+                const scanButton =
+                    document.getElementById(
+                        "scanButton"
+                    );
+
+
+                if (
+                    scanForm &&
+                    scanButton
+                ) {
+
+                    scanForm.addEventListener(
+                        "submit",
+                        function () {
+
+                            scanButton.classList.add(
+                                "loading"
+                            );
+
+                            scanButton.textContent =
+                                "Scanning";
+
+                        }
+                    );
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>
